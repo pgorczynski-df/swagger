@@ -7,9 +7,9 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Swashbuckle.AspNetCore.Examples;
 using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using YamlDotNet.Core;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 using YamlDotNet.Serialization.TypeInspectors;
@@ -28,45 +28,49 @@ namespace SwaggerPhun
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc();
+            MvcServiceCollectionExtensions.AddMvc(services);
 
-            services.AddSwaggerGen(c =>
+            SwaggerGenServiceCollectionExtensions.AddSwaggerGen(services, c =>
             {
                 c.SwaggerDoc("v1", new Info
                 {
                     Version = "v1",
                     Title = "File Comment API",
                     Description = "An api endpoint for managing file comments",
-                        //TermsOfService = "None",
-                        Contact = new Contact
+                    //TermsOfService = "None",
+                    Contact = new Contact
                     {
                         Name = "Pawel Gorczynski",
-                        Email = "pawel.gorczynski@devfactory.com",
+                        Email = "pawel.gorczynski@devfactory.com"
                     },
                     License = new License
                     {
                         Name = "Use under LICX",
                         Url = "https://example.com/license"
-                    },
+                    }
                 });
 
                 c.DocumentFilter<YamlDocumentFilter>();
 
-                    // Set the comments path for the Swagger JSON and UI.
-                    var xmlFile = $"{Assembly.GetEntryAssembly().GetName().Name}.xml";
+                // Set the comments path for the Swagger JSON and UI.
+                var xmlFile = $"{Assembly.GetEntryAssembly().GetName().Name}.xml";
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 c.IncludeXmlComments(xmlPath);
-            });
 
+                c.OperationFilter<ExamplesOperationFilter>(); // [SwaggerRequestExample] & [SwaggerResponseExample]
+                c.OperationFilter<DescriptionOperationFilter>(); // [Description] on Response properties
+                c.OperationFilter<AuthorizationInputOperationFilter>(); // Adds an Authorization input box to every endpoint
+                c.OperationFilter<AddFileParamTypesOperationFilter>(); // Adds an Upload button to endpoints which have [AddSwaggerFileUploadButton]
+                c.OperationFilter<AddHeaderOperationFilter>("correlationId","Correlation Id for the request"); // adds any string you like to the request headers - in this case, a correlation id
+                c.OperationFilter<AddResponseHeadersFilter>(); // [SwaggerResponseHeader]
+                c.OperationFilter<AppendAuthorizeToSummaryOperationFilter>(); // Adds "(Auth)" to the summary so that you can see which endpoints have Authorization
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
+            if (env.IsDevelopment()) app.UseDeveloperExceptionPage();
 
             app.UseMvc();
 
@@ -74,10 +78,7 @@ namespace SwaggerPhun
             app.UseSwagger();
 
             // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.), specifying the Swagger JSON endpoint.
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
-            });
+            app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1"); });
         }
 
         private class YamlDocumentFilter : IDocumentFilter
@@ -110,14 +111,14 @@ namespace SwaggerPhun
 
             public PropertiesIgnoreTypeInspector(ITypeInspector typeInspector)
             {
-                this._typeInspector = typeInspector;
+                _typeInspector = typeInspector;
             }
 
             public override IEnumerable<IPropertyDescriptor> GetProperties(Type type, object container)
             {
-                return _typeInspector.GetProperties(type, container).Where(p => p.Name != "extensions" && p.Name != "operation-id");
+                return _typeInspector.GetProperties(type, container)
+                    .Where(p => p.Name != "extensions" && p.Name != "operation-id");
             }
-
         }
     }
 }
