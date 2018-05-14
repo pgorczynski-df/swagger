@@ -10,7 +10,6 @@ namespace SwaggerPhun.Controllers
     /// <response code="401">If the authentication header is missing or user was not authenticated</response> 
     /// <response code="500">If a server-side error occured</response> 
     [Route("[controller]")]
-
     [ProducesResponseType(200)]
     [ProducesResponseType(typeof(ErrorDescriptor), 400)]
     [ProducesResponseType(typeof(ErrorDescriptor), 401)]
@@ -55,6 +54,7 @@ namespace SwaggerPhun.Controllers
         /// <summary>
         /// Updates an existing comment
         /// </summary>
+        /// <param name="fileId"></param>
         /// <param name="commentId"></param>
         /// <param name="commentDto"></param>
         /// <response code="403">When the invoking user in not the author of the comment</response> 
@@ -62,22 +62,23 @@ namespace SwaggerPhun.Controllers
         /// <response code="401">If the authentication header is missing or user was not authenticated</response> 
         /// <response code="403">When the user has no rights to see or comment the file or is not the comment author</response> 
         /// <response code="500">If a server-side error occured</response> 
-        [HttpPut("{commentId}")]
-        public void Put([FromRoute]int commentId, [FromBody] FileCommentDto commentDto)
+        [HttpPut("{fileId}/{commentId}")]
+        public void Put([FromRoute]int fileId, [FromRoute]int commentId, [FromBody] FileCommentDto commentDto)
         {
         }
 
         /// <summary>
         /// Deletes an existing comment
         /// </summary>
+        /// <param name="fileId"></param>
         /// <param name="commentId"></param>
         /// <response code="400">If arguments are missing or invalid</response> 
         /// <response code="401">If the authentication header is missing or user was not authenticated</response> 
         /// <response code="403">When the user has no rights to see or comment the file</response> 
         /// <response code="500">If a server-side error occured</response> 
-        [HttpDelete("{commentId}")]
+        [HttpDelete("{fileId}/{commentId}")]
         [ProducesResponseType(typeof(ErrorDescriptor), 403)]
-        public void Delete([FromRoute]int commentId)
+        public void Delete([FromRoute]int fileId, [FromRoute]int commentId)
         {
         }
     }
