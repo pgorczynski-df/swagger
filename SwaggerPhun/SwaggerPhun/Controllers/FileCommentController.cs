@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Examples;
 
 namespace SwaggerPhun.Controllers
 {
@@ -45,6 +46,7 @@ namespace SwaggerPhun.Controllers
         /// <response code="500">If a server-side error occured</response> 
         [HttpPost("{fileId}")]
         [ProducesResponseType(201)]
+        [SwaggerResponseHeader(201, "Location", "string", "url of the file created")]
         public int Post([FromRoute]int fileId, [FromBody] FileCommentDto commentDto)
         {
             return 1;
@@ -62,7 +64,7 @@ namespace SwaggerPhun.Controllers
         /// <response code="403">When the user has no rights to see or comment the file or is not the comment author</response> 
         /// <response code="500">If a server-side error occured</response> 
         [HttpPatch("{fileId}/{commentId}")]
-        [ProducesResponseType(200)]
+        [ProducesResponseType(204)]
         public void Patch([FromRoute]int fileId, [FromRoute]int commentId, [FromBody] FileCommentDto commentDto)
         {
         }
@@ -77,7 +79,7 @@ namespace SwaggerPhun.Controllers
         /// <response code="403">When the user has no rights to see or comment the file</response> 
         /// <response code="500">If a server-side error occured</response> 
         [HttpDelete("{fileId}/{commentId}")]
-        [ProducesResponseType(200)]
+        [ProducesResponseType(204)]
         [ProducesResponseType(typeof(ErrorDescriptor), 403)]
         public void Delete([FromRoute]int fileId, [FromRoute]int commentId)
         {
