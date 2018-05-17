@@ -62,9 +62,11 @@ namespace SwaggerPhun.Controllers
         /// <response code="400">If arguments are missing or invalid</response> 
         /// <response code="401">If the authentication header is missing or user was not authenticated</response> 
         /// <response code="403">When the user has no rights to see or comment the file or is not the comment author</response> 
+        /// <response code="422">If fileId or commentId does not point to a valid entity</response> 
         /// <response code="500">If a server-side error occured</response> 
         [HttpPatch("{fileId}/{commentId}")]
         [ProducesResponseType(204)]
+        [ProducesResponseType(typeof(ErrorDescriptor), 422)]
         public void Patch([FromRoute]int fileId, [FromRoute]int commentId, [FromBody] FileCommentDto commentDto)
         {
         }
@@ -77,10 +79,12 @@ namespace SwaggerPhun.Controllers
         /// <response code="400">If arguments are missing or invalid</response> 
         /// <response code="401">If the authentication header is missing or user was not authenticated</response> 
         /// <response code="403">When the user has no rights to see or comment the file</response> 
+        /// <response code="422">If fileId or commentId does not point to a valid entity</response> 
         /// <response code="500">If a server-side error occured</response> 
         [HttpDelete("{fileId}/{commentId}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(typeof(ErrorDescriptor), 403)]
+        [ProducesResponseType(typeof(ErrorDescriptor), 422)]
         public void Delete([FromRoute]int fileId, [FromRoute]int commentId)
         {
         }
