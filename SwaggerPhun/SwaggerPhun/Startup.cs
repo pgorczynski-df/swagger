@@ -35,7 +35,7 @@ namespace SwaggerPhun
                     Contact = new Contact
                     {
                         Name = "Pawel Gorczynski",
-                        Email = "pawel.gorczynski@devfactory.com"
+                        Email = "pawel.gorczynski@email.com"
                     },
                     License = new License
                     {
@@ -49,12 +49,18 @@ namespace SwaggerPhun
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 c.IncludeXmlComments(xmlPath);
 
+                // Using some of below operations e.g. OperationFilter<AddResponseHeadersFilter>();  
+                // and the following lines both at the same time
+                // app.UseSwaggerYaml();
+                // app.UseSwagger(); 
+                // causes an exception to be thrown because of an attempt to add the same header value twice.
+
                 //c.OperationFilter<ExamplesOperationFilter>(); // [SwaggerRequestExample] & [SwaggerResponseExample]
                 //c.OperationFilter<DescriptionOperationFilter>(); // [Description] on Response properties
                 //c.OperationFilter<AuthorizationInputOperationFilter>(); // Adds an Authorization input box to every endpoint
                 //c.OperationFilter<AddFileParamTypesOperationFilter>(); // Adds an Upload button to endpoints which have [AddSwaggerFileUploadButton]
                 //c.OperationFilter<AddHeaderOperationFilter>("correlationId","Correlation Id for the request"); // adds any string you like to the request headers - in this case, a correlation id
-               c.OperationFilter<AddResponseHeadersFilter>(); // [SwaggerResponseHeader]
+                //c.OperationFilter<AddResponseHeadersFilter>(); // [SwaggerResponseHeader]
                 //c.OperationFilter<AppendAuthorizeToSummaryOperationFilter>(); // Adds "(Auth)" to the summary so that you can see which endpoints have Authorization
             });
         }
@@ -62,19 +68,23 @@ namespace SwaggerPhun
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            if (env.IsDevelopment()) app.UseDeveloperExceptionPage();
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
 
             app.UseMvc();
 
-            // Enable middleware to serve generated Swagger as a JSON endpoint.
-            //app.UseSwagger();
+            // Enable middleware to serve generated Swagger as a YAML endpoint
             app.UseSwaggerYaml();
+
+            // Enable middleware to serve generated Swagger as a JSON endpoint.
+            app.UseSwagger();
 
             // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.), specifying the Swagger JSON endpoint.
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
-                //c.SwaggerEndpoint("/swagger/v1/swagger.yaml", "My API V1 yaml");
             });
         }
     }

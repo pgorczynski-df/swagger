@@ -9,16 +9,17 @@ namespace Swashbuckle.AspNetCore.Swagger.Yaml
     public class PropertiesIgnoreTypeInspector : TypeInspectorSkeleton
     {
         private readonly ITypeInspector _typeInspector;
+        private readonly string[] _ignoredProperties;
 
-        public PropertiesIgnoreTypeInspector(ITypeInspector typeInspector)
+        public PropertiesIgnoreTypeInspector(ITypeInspector typeInspector, string[] ignoredProperties)
         {
-            _typeInspector = typeInspector;
+            _typeInspector = typeInspector ?? throw new ArgumentNullException(nameof(typeInspector));
+            _ignoredProperties = ignoredProperties ?? throw new ArgumentNullException(nameof(ignoredProperties));
         }
 
         public override IEnumerable<IPropertyDescriptor> GetProperties(Type type, object container)
         {
-            return _typeInspector.GetProperties(type, container)
-                .Where(p => p.Name != "extensions" && p.Name != "operation-id");
+            return _typeInspector.GetProperties(type, container).Where(p => !_ignoredProperties.Contains(p.Name));
         }
     }
 }

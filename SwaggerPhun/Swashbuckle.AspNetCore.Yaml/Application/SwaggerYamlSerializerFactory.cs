@@ -1,20 +1,16 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
-using YamlDotNet.Serialization;
+﻿using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
 namespace Swashbuckle.AspNetCore.Swagger.Yaml
 {
-    class SwaggerYamlSerializerFactory
+    public class SwaggerYamlSerializerFactory
     {
-        public static Serializer Create(IOptions<MvcJsonOptions> applicationJsonOptions)
+        public static Serializer Create(SwaggerYamlOptions swaggerYamlOptions)
         {
             var builder = new SerializerBuilder();
             builder.WithNamingConvention(new HyphenatedNamingConvention());
-            builder.WithTypeInspector(innerInspector => new PropertiesIgnoreTypeInspector(innerInspector));
-
+            builder.WithTypeInspector(innerInspector => new PropertiesIgnoreTypeInspector(innerInspector, swaggerYamlOptions.IgnoredProperties));
             return builder.Build();
         }
-
     }
 }

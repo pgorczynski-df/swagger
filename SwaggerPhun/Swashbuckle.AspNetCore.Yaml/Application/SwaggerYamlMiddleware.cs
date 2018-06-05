@@ -2,10 +2,8 @@
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Routing.Template;
-using Microsoft.Extensions.Options;
 using YamlDotNet.Serialization;
 
 namespace Swashbuckle.AspNetCore.Swagger.Yaml
@@ -15,20 +13,19 @@ namespace Swashbuckle.AspNetCore.Swagger.Yaml
         private readonly RequestDelegate _next;
         private readonly ISwaggerProvider _swaggerProvider;
         private readonly Serializer _swaggerSerializer;
-        private readonly SwaggerOptions _options;
+        private readonly SwaggerYamlOptions _options;
         private readonly TemplateMatcher _requestMatcher;
 
         public SwaggerYamlMiddleware(
             RequestDelegate next,
             ISwaggerProvider swaggerProvider,
-            IOptions<MvcJsonOptions> mvcJsonOptions,
-            SwaggerOptions options)
+            SwaggerYamlOptions options)
         {
             _next = next;
             _swaggerProvider = swaggerProvider;
-            _swaggerSerializer = SwaggerYamlSerializerFactory.Create(mvcJsonOptions);
+            _swaggerSerializer = SwaggerYamlSerializerFactory.Create(options);
             _options = options;
-            _requestMatcher = new TemplateMatcher(TemplateParser.Parse(options.RouteTemplate), new RouteValueDictionary());
+            _requestMatcher = new TemplateMatcher(TemplateParser.Parse(_options.SwaggerOptions.RouteTemplate), new RouteValueDictionary());
         }
 
         public async Task Invoke(HttpContext httpContext)
@@ -46,7 +43,7 @@ namespace Swashbuckle.AspNetCore.Swagger.Yaml
             var swagger = _swaggerProvider.GetSwagger(documentName, null, basePath);
 
             // One last opportunity to modify the Swagger Document - this time with request context
-            foreach (var filter in _options.PreSerializeFilters)
+            foreach (var filter in _options.SwaggerOptions.PreSerializeFilters)
             {
                 filter(swagger, httpContext.Request);
             }
