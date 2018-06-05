@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -9,10 +7,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Swashbuckle.AspNetCore.Examples;
 using Swashbuckle.AspNetCore.Swagger;
-using Swashbuckle.AspNetCore.SwaggerGen;
-using YamlDotNet.Serialization;
-using YamlDotNet.Serialization.NamingConventions;
-using YamlDotNet.Serialization.TypeInspectors;
 
 namespace SwaggerPhun
 {
@@ -28,9 +22,9 @@ namespace SwaggerPhun
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            MvcServiceCollectionExtensions.AddMvc(services);
+            services.AddMvc();
 
-            SwaggerGenServiceCollectionExtensions.AddSwaggerGen(services, c =>
+            services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new Info
                 {
@@ -49,8 +43,6 @@ namespace SwaggerPhun
                         Url = "https://example.com/license"
                     }
                 });
-
-                c.DocumentFilter<YamlDocumentFilter>();
 
                 // Set the comments path for the Swagger JSON and UI.
                 var xmlFile = $"{Assembly.GetEntryAssembly().GetName().Name}.xml";
@@ -75,50 +67,15 @@ namespace SwaggerPhun
             app.UseMvc();
 
             // Enable middleware to serve generated Swagger as a JSON endpoint.
-            app.UseSwagger();
+            //app.UseSwagger();
+            app.UseSwaggerYaml();
 
             // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.), specifying the Swagger JSON endpoint.
-            app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1"); });
-        }
-
-        private class YamlDocumentFilter : IDocumentFilter
-        {
-            public void Apply(SwaggerDocument swaggerDoc, DocumentFilterContext context)
+            app.UseSwaggerUI(c =>
             {
-                var builder = new SerializerBuilder();
-                builder.WithNamingConvention(new HyphenatedNamingConvention());
-                builder.WithTypeInspector(innerInspector => new PropertiesIgnoreTypeInspector(innerInspector));
-
-                var serializer = builder.Build();
-
-                using (var writer = new StringWriter())
-                {
-                    serializer.Serialize(writer, swaggerDoc);
-
-                    var file = AppDomain.CurrentDomain.BaseDirectory + "swagger_yaml.txt";
-                    using (var stream = new StreamWriter(file))
-                    {
-                        var result = writer.ToString();
-                        stream.WriteLine(result.Replace("2.0", "\"2.0\"").Replace("ref:", "$ref:"));
-                    }
-                }
-            }
-        }
-
-        private class PropertiesIgnoreTypeInspector : TypeInspectorSkeleton
-        {
-            private readonly ITypeInspector _typeInspector;
-
-            public PropertiesIgnoreTypeInspector(ITypeInspector typeInspector)
-            {
-                _typeInspector = typeInspector;
-            }
-
-            public override IEnumerable<IPropertyDescriptor> GetProperties(Type type, object container)
-            {
-                return _typeInspector.GetProperties(type, container)
-                    .Where(p => p.Name != "extensions" && p.Name != "operation-id");
-            }
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+                //c.SwaggerEndpoint("/swagger/v1/swagger.yaml", "My API V1 yaml");
+            });
         }
     }
 }
