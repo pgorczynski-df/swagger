@@ -12,6 +12,7 @@ namespace Swashbuckle.AspNetCore.Swagger.Yaml
             builder.WithNamingConvention(new HyphenatedNamingConvention());
             builder.WithTypeInspector(innerInspector => new PropertiesIgnoreTypeInspector(innerInspector, swaggerYamlOptions.IgnoredProperties));
             builder.WithTypeInspector(innerInspector => new JsonPropertyNameApplyingTypeInspector(innerInspector));
+            builder.WithTypeInspector(innerInspector => new StringQuotingTypeInspector(innerInspector));
             return builder.Build();
         }
     }

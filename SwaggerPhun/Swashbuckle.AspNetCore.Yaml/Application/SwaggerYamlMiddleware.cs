@@ -72,7 +72,7 @@ namespace Swashbuckle.AspNetCore.Swagger.Yaml
             using (var writer = new StringWriter(jsonBuilder))
             {
                 _swaggerSerializer.Serialize(writer, swagger);
-                await response.WriteAsync(jsonBuilder.ToString().Replace("2.0", "\"2.0\""), new UTF8Encoding(false));
+                await response.WriteAsync(jsonBuilder.ToString(), new UTF8Encoding(false));
             }
         }
 

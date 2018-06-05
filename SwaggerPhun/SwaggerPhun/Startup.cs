@@ -60,7 +60,7 @@ namespace SwaggerPhun
                 //c.OperationFilter<AuthorizationInputOperationFilter>(); // Adds an Authorization input box to every endpoint
                 //c.OperationFilter<AddFileParamTypesOperationFilter>(); // Adds an Upload button to endpoints which have [AddSwaggerFileUploadButton]
                 //c.OperationFilter<AddHeaderOperationFilter>("correlationId","Correlation Id for the request"); // adds any string you like to the request headers - in this case, a correlation id
-                //c.OperationFilter<AddResponseHeadersFilter>(); // [SwaggerResponseHeader]
+                c.OperationFilter<AddResponseHeadersFilter>(); // [SwaggerResponseHeader]
                 //c.OperationFilter<AppendAuthorizeToSummaryOperationFilter>(); // Adds "(Auth)" to the summary so that you can see which endpoints have Authorization
             });
         }
@@ -78,14 +78,14 @@ namespace SwaggerPhun
             // Enable middleware to serve generated Swagger as a YAML endpoint "/swagger/v1/swagger.yaml"
             app.UseSwaggerYaml();
 
-            // Enable middleware to serve generated Swagger as a JSON endpoint "/swagger/v1/swagger.json"
-            app.UseSwagger();
+            //// Enable middleware to serve generated Swagger as a JSON endpoint "/swagger/v1/swagger.json"
+            //app.UseSwagger();
 
-            // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.), specifying the Swagger JSON endpoint.
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
-            });
+            //// Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.), specifying the Swagger JSON endpoint.
+            //app.UseSwaggerUI(c =>
+            //{
+            //    c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+            //});
         }
     }
 }
