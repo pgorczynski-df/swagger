@@ -1,4 +1,5 @@
-﻿using YamlDotNet.Serialization;
+﻿using Swashbuckle.AspNetCore.Yaml.Application;
+using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 
 namespace Swashbuckle.AspNetCore.Swagger.Yaml
@@ -10,6 +11,7 @@ namespace Swashbuckle.AspNetCore.Swagger.Yaml
             var builder = new SerializerBuilder();
             builder.WithNamingConvention(new HyphenatedNamingConvention());
             builder.WithTypeInspector(innerInspector => new PropertiesIgnoreTypeInspector(innerInspector, swaggerYamlOptions.IgnoredProperties));
+            builder.WithTypeInspector(innerInspector => new JsonPropertyNameApplyingTypeInspector(innerInspector));
             return builder.Build();
         }
     }
